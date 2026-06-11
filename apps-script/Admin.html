@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><?= systemName ?>｜管理後台</title>
+
+  <style>
+    :root {
+      --main: #1f5fbf;
+      --main-dark: #17488f;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d8dee9;
+      --danger: #b91c1c;
+      --ok: #047857;
+      --warning: #b45309;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: linear-gradient(135deg, #111827, #1f5fbf);
+      color: white;
+      padding: 20px 16px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    header p {
+      margin: 7px 0 0;
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 18px auto 40px;
+      padding: 0 14px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+      margin-bottom: 16px;
+    }
+
+    .login {
+      max-width: 420px;
+      margin: 40px auto;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 11px;
+      font-size: 15px;
+      background: white;
+      color: var(--text);
+    }
+
+    textarea {
+      min-height: 76px;
+      resize: vertical;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .primary {
+      background: var(--main);
+      color: white;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .danger {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr) auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .message {
+      margin-top: 12px;
+      padding: 11px;
+      border-radius: 10px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .message.ok {
+      display: block;
+      background: #ecfdf5;
+      color: var(--ok);
+      border: 1px solid #a7f3d0;
+    }
+
+    .message.error {
+      display: block;
+      background: #fef2f2;
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1000px;
+      background: white;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 8px;
+      text-align: left;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f1f5f9;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    tr:hover {
+      background: #f8fafc;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: #e8f0fe;
+      color: var(--main-dark);
+      font-weight: bold;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .urgency-high {
+      color: var(--danger);
+      font-weight: bold;
+    }
+
+    .urgency-mid {
+      color: var(--warning);
+      font-weight: bold;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 12px;
+      overflow-y: auto;
+      z-index: 99;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 18px;
+      width: 100%;
+      max-width: 920px;
+      padding: 18px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .info {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .info b {
+      display: inline-block;
+      min-width: 90px;
+      color: var(--muted);
+    }
+
+    .link {
+      color: var(--main);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .log-item {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.6;
+      background: #fff;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .filters {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      header h1 {
+        font-size: 19px;
+      }
+
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .modal-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1><?= systemName ?></h1>
+    <p>管理後台</p>
+  </header>
+
+  <main>
+    <section id="loginPanel" class="card login">
+      <h2>管理者登入</h2>
+      <label>管理密碼</label>
+      <input id="password" type="password" placeholder="請輸入管理密碼">
+
+      <div style="margin-top: 14px;">
+        <button class="primary" onclick="login()">登入</button>
+      </div>
+
+      <div id="loginMessage" class="message"></div>
+    </section>
+
+    <section id="adminPanel" class="hidden">
+      <div class="card">
+        <div class="filters">
+          <div>
+            <label>狀態</label>
+            <select id="filterStatus">
+              <option value="">全部</option>
+              <? statuses.forEach(function(s) { ?>
+                <option><?= s ?></option>
+              <? }); ?>
+            </select>
+          </div>
+
+          <div>
+            <label>緊急程度</label>
+            <select id="filterUrgency">
+              <option value="">全部</option>
+              <? urgencyLevels.forEach(function(u) { ?>
+                <option><?= u ?></option>
+              <? }); ?>
+            </select>
+          </div>
+
+          <div>
+            <label>採購類別</label>
+            <select id="filterCategory">
+              <option value="">全部</option>
+              <? categories.forEach(function(c) { ?>
+                <option><?= c ?></option>
+              <? }); ?>
+            </select>
+          </div>
+
+          <div>
+            <label>關鍵字</label>
+            <input id="filterKeyword" type="text" placeholder="品名、申請人、廠商">
+          </div>
+
+          <div>
+            <label>&nbsp;</label>
+            <button class="primary" onclick="loadRequests()">查詢</button>
+          </div>
+
+          <div>
+            <label>&nbsp;</label>
+            <button class="secondary" onclick="clearFilters()">清除</button>
+          </div>
+        </div>
+
+        <div id="listMessage" class="message"></div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>申請編號</th>
+                <th>建立時間</th>
+                <th>申請人</th>
+                <th>部門</th>
+                <th>類別</th>
+                <th>品名</th>
+                <th>數量</th>
+                <th>緊急</th>
+                <th>希望到貨</th>
+                <th>狀態</th>
+                <th>負責人</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="requestRows">
+              <tr>
+                <td colspan="12">請先登入。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">採購申請</h2>
+        <button class="secondary" onclick="closeModal()">關閉</button>
+      </div>
+
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    let adminToken = '';
+    let records = [];
+    let currentRecord = null;
+
+    function login() {
+      const password = document.getElementById('password').value.trim();
+
+      if (!password) {
+        showMessage('loginMessage', 'error', '請輸入管理密碼。');
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res && res.ok) {
+            adminToken = res.token;
+            document.getElementById('loginPanel').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            loadRequests();
+          } else {
+            showMessage('loginMessage', 'error', (res && res.message) || '登入失敗');
+          }
+        })
+        .withFailureHandler(function(err) {
+          showMessage('loginMessage', 'error', err.message || String(err));
+        })
+        .adminLogin(password);
+    }
+
+    function loadRequests() {
+      showMessage('listMessage', 'ok', '資料讀取中...');
+
+      const filter = {
+        status: value('filterStatus'),
+        urgency: value('filterUrgency'),
+        category: value('filterCategory'),
+        keyword: value('filterKeyword')
+      };
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (!res || !res.ok) {
+            showMessage('listMessage', 'error', (res && res.message) || '讀取失敗');
+            return;
+          }
+
+          records = res.records || [];
+          renderTable(records);
+          showMessage('listMessage', 'ok', '共 ' + records.length + ' 筆資料。');
+        })
+        .withFailureHandler(function(err) {
+          showMessage('listMessage', 'error', err.message || String(err));
+        })
+        .getAdminRequests(filter);
+    }
+
+    function renderTable(list) {
+      const tbody = document.getElementById('requestRows');
+
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="12">目前沒有資料。</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map((r, index) => `
+        <tr>
+          <td>${escapeHtml(r.requestNo)}</td>
+          <td>${escapeHtml(r.createdAt)}</td>
+          <td>${escapeHtml(r.name)}</td>
+          <td>${escapeHtml(r.department)}</td>
+          <td>${escapeHtml(r.category)}</td>
+          <td>${escapeHtml(r.itemName)}</td>
+          <td>${escapeHtml(r.quantity)}</td>
+          <td class="${urgencyClass(r.urgency)}">${escapeHtml(r.urgency)}</td>
+          <td>${escapeHtml(r.desiredDate)}</td>
+          <td><span class="status">${escapeHtml(r.status)}</span></td>
+          <td>${escapeHtml(r.owner)}</td>
+          <td><button class="primary" onclick="openDetail(${index})">查看/處理</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function openDetail(index) {
+      currentRecord = records[index];
+
+      document.getElementById('modalTitle').textContent = currentRecord.requestNo + '｜' + currentRecord.itemName;
+
+      document.getElementById('modalContent').innerHTML = `
+        <div class="info">
+          <div><b>申請編號</b>${escapeHtml(currentRecord.requestNo)}</div>
+          <div><b>建立時間</b>${escapeHtml(currentRecord.createdAt)}</div>
+          <div><b>申請人</b>${escapeHtml(currentRecord.name)}</div>
+          <div><b>部門</b>${escapeHtml(currentRecord.department)}</div>
+          <div><b>Email</b>${escapeHtml(currentRecord.email)}</div>
+          <div><b>採購類別</b>${escapeHtml(currentRecord.category)}</div>
+          <div><b>品名</b>${escapeHtml(currentRecord.itemName)}</div>
+          <div><b>規格說明</b>${nl2br(currentRecord.spec)}</div>
+          <div><b>數量</b>${escapeHtml(currentRecord.quantity)}</div>
+          <div><b>用途說明</b>${nl2br(currentRecord.purpose)}</div>
+          <div><b>緊急程度</b>${escapeHtml(currentRecord.urgency)}</div>
+          <div><b>希望到貨</b>${escapeHtml(currentRecord.desiredDate)}</div>
+          <div><b>預估金額</b>${escapeHtml(currentRecord.estimatedAmount)}</div>
+          <div><b>參考連結</b>${renderLink(currentRecord.referenceUrl)}</div>
+          <div><b>附件圖片</b>${renderLink(currentRecord.attachmentUrl)}</div>
+        </div>
+
+        <div style="height: 14px;"></div>
+
+        <div class="grid">
+          <div>
+            <label>狀態</label>
+            <select id="editStatus">
+              <? statuses.forEach(function(s) { ?>
+                <option><?= s ?></option>
+              <? }); ?>
+            </select>
+          </div>
+
+          <div>
+            <label>負責人</label>
+            <input id="editOwner" type="text">
+          </div>
+
+          <div>
+            <label>廠商</label>
+            <input id="editVendor" type="text">
+          </div>
+
+          <div>
+            <label>實際金額</label>
+            <input id="editActualAmount" type="number" min="0">
+          </div>
+
+          <div>
+            <label>預定購買日</label>
+            <input id="editPurchaseDate" type="date">
+          </div>
+
+          <div>
+            <label>預定到貨日</label>
+            <input id="editArrivalDate" type="date">
+          </div>
+
+          <div class="full">
+            <label>管理備註</label>
+            <textarea id="editAdminNote"></textarea>
+          </div>
+        </div>
+
+        <div style="margin-top: 14px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="primary" onclick="saveDetail()">儲存更新</button>
+          <button class="secondary" onclick="loadLogs()">查看處理紀錄</button>
+        </div>
+
+        <div id="modalMessage" class="message"></div>
+        <div id="logsBox"></div>
+      `;
+
+      document.getElementById('editStatus').value = currentRecord.status || '待處理';
+      document.getElementById('editOwner').value = currentRecord.owner || '';
+      document.getElementById('editVendor').value = currentRecord.vendor || '';
+      document.getElementById('editActualAmount').value = currentRecord.actualAmount || '';
+      document.getElementById('editPurchaseDate').value = normalizeDate(currentRecord.purchaseDate);
+      document.getElementById('editArrivalDate').value = normalizeDate(currentRecord.arrivalDate);
+      document.getElementById('editAdminNote').value = currentRecord.adminNote || '';
+
+      document.getElementById('modalBackdrop').style.display = 'flex';
+    }
+
+    function saveDetail() {
+      if (!currentRecord) return;
+
+      showMessage('modalMessage', 'ok', '更新中...');
+
+      const payload = {
+        requestNo: currentRecord.requestNo,
+        status: value('editStatus'),
+        owner: value('editOwner'),
+        vendor: value('editVendor'),
+        actualAmount: value('editActualAmount'),
+        purchaseDate: value('editPurchaseDate'),
+        arrivalDate: value('editArrivalDate'),
+        adminNote: value('editAdminNote'),
+        updatedBy: '管理者'
+      };
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res && res.ok) {
+            showMessage('modalMessage', 'ok', '已更新完成。');
+            loadRequests();
+          } else {
+            showMessage('modalMessage', 'error', (res && res.message) || '更新失敗');
+          }
+        })
+        .withFailureHandler(function(err) {
+          showMessage('modalMessage', 'error', err.message || String(err));
+        })
+        .updatePurchaseRequest(payload);
+    }
+
+    function loadLogs() {
+      if (!currentRecord) return;
+
+      document.getElementById('logsBox').innerHTML = '<div class="log-item">處理紀錄讀取中...</div>';
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (!res || !res.ok) {
+            document.getElementById('logsBox').innerHTML = '<div class="log-item">讀取失敗。</div>';
+            return;
+          }
+
+          const logs = res.logs || [];
+
+          if (!logs.length) {
+            document.getElementById('logsBox').innerHTML = '<div class="log-item">尚無處理紀錄。</div>';
+            return;
+          }
+
+          document.getElementById('logsBox').innerHTML = `
+            <h3>處理紀錄</h3>
+            ${logs.map(log => `
+              <div class="log-item">
+                <div><b>${escapeHtml(log.updatedAt)}</b></div>
+                <div>狀態：${escapeHtml(log.oldStatus)} → ${escapeHtml(log.newStatus)}</div>
+                <div>負責人：${escapeHtml(log.owner)}</div>
+                <div>廠商：${escapeHtml(log.vendor)}</div>
+                <div>實際金額：${escapeHtml(log.actualAmount)}</div>
+                <div>預定購買日：${escapeHtml(log.purchaseDate)}</div>
+                <div>預定到貨日：${escapeHtml(log.arrivalDate)}</div>
+                <div>備註：${nl2br(log.note)}</div>
+                <div>更新人：${escapeHtml(log.updatedBy)}</div>
+              </div>
+            `).join('')}
+          `;
+        })
+        .withFailureHandler(function(err) {
+          document.getElementById('logsBox').innerHTML = '<div class="log-item">' + escapeHtml(err.message || String(err)) + '</div>';
+        })
+        .getRequestLogs(currentRecord.requestNo);
+    }
+
+    function closeModal() {
+      document.getElementById('modalBackdrop').style.display = 'none';
+      currentRecord = null;
+    }
+
+    function clearFilters() {
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterUrgency').value = '';
+      document.getElementById('filterCategory').value = '';
+      document.getElementById('filterKeyword').value = '';
+      loadRequests();
+    }
+
+    function value(id) {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
+    }
+
+    function showMessage(id, type, text) {
+      const el = document.getElementById(id);
+      el.className = 'message ' + type;
+      el.innerHTML = text;
+    }
+
+    function renderLink(url) {
+      if (!url) return '';
+      const safe = escapeHtml(url);
+      return `<a class="link" href="${safe}" target="_blank">開啟連結</a>`;
+    }
+
+    function urgencyClass(value) {
+      if (value === '影響作業') return 'urgency-high';
+      if (value === '急用') return 'urgency-mid';
+      return '';
+    }
+
+    function normalizeDate(text) {
+      if (!text) return '';
+      const s = String(text).replaceAll('/', '-');
+      const m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+      if (!m) return '';
+      return m[1] + '-' + String(m[2]).padStart(2, '0') + '-' + String(m[3]).padStart(2, '0');
+    }
+
+    function nl2br(text) {
+      return escapeHtml(text || '').replaceAll('\n', '<br>');
+    }
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+  </script>
+</body>
+</html>

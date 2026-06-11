@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><?= systemName ?></title>
+
+  <style>
+    :root {
+      --main: #1f5fbf;
+      --main-dark: #17488f;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d8dee9;
+      --danger: #b91c1c;
+      --ok: #047857;
+      --warning: #b45309;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Microsoft JhengHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--main), var(--main-dark));
+      color: white;
+      padding: 22px 16px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 18px auto 40px;
+      padding: 0 14px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--main);
+      color: white;
+      border-color: var(--main);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0 0 14px;
+      border-left: 5px solid var(--main);
+      padding-left: 10px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .required {
+      color: var(--danger);
+      margin-left: 3px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-size: 16px;
+      background: white;
+      color: var(--text);
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .primary {
+      background: var(--main);
+      color: white;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .primary:disabled {
+      background: #93a8c9;
+      cursor: not-allowed;
+    }
+
+    .message {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      display: none;
+      line-height: 1.6;
+    }
+
+    .message.ok {
+      display: block;
+      background: #ecfdf5;
+      color: var(--ok);
+      border: 1px solid #a7f3d0;
+    }
+
+    .message.error {
+      display: block;
+      background: #fef2f2;
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .preview img {
+      width: 100px;
+      height: 100px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      object-fit: cover;
+    }
+
+    .record {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 12px;
+      background: #fff;
+    }
+
+    .record h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #e8f0fe;
+      color: var(--main-dark);
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 5px 10px;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+
+    .kv .k {
+      color: var(--muted);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 680px) {
+      header h1 {
+        font-size: 20px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .kv {
+        grid-template-columns: 90px 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1><?= systemName ?></h1>
+    <p>辦公室用品、總務用品、修繕材料等採購申請</p>
+  </header>
+
+  <main>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('apply')">我要申請</button>
+      <button class="tab-btn" onclick="showTab('query')">查詢進度</button>
+    </div>
+
+    <section id="applyTab">
+      <div class="card">
+        <h2 class="section-title">申請人資料</h2>
+
+        <div class="grid">
+          <div>
+            <label>姓名<span class="required">*</span></label>
+            <input id="name" type="text" placeholder="請輸入姓名">
+          </div>
+
+          <div>
+            <label>4 位查詢碼<span class="required">*</span></label>
+            <input id="queryCode" type="tel" maxlength="4" placeholder="例如 1234">
+            <div class="hint">之後可用「姓名 + 查詢碼」查詢進度。</div>
+          </div>
+
+          <div>
+            <label>部門<span class="required">*</span></label>
+            <select id="department">
+              <option value="">請選擇</option>
+              <option>製課</option>
+              <option>品保</option>
+              <option>倉庫</option>
+              <option>組立</option>
+              <option>前面辦公室</option>
+              <option>經營層</option>
+              <option>其他</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Email</label>
+            <input id="email" type="email" placeholder="選填">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="section-title">採購內容</h2>
+
+        <div class="grid">
+          <div>
+            <label>採購類別<span class="required">*</span></label>
+            <select id="category">
+              <option value="">請選擇</option>
+              <? categories.forEach(function(c) { ?>
+                <option><?= c ?></option>
+              <? }); ?>
+            </select>
+          </div>
+
+          <div>
+            <label>品名<span class="required">*</span></label>
+            <input id="itemName" type="text" placeholder="例如 A4 影印紙、滑鼠、清潔劑">
+          </div>
+
+          <div class="full">
+            <label>規格說明</label>
+            <textarea id="spec" placeholder="例如品牌、型號、尺寸、顏色、材質等，不清楚可空白"></textarea>
+          </div>
+
+          <div>
+            <label>數量<span class="required">*</span></label>
+            <input id="quantity" type="number" min="1" placeholder="請輸入數量">
+          </div>
+
+          <div>
+            <label>緊急程度<span class="required">*</span></label>
+            <select id="urgency">
+              <option value="">請選擇</option>
+              <? urgencyLevels.forEach(function(u) { ?>
+                <option><?= u ?></option>
+              <? }); ?>
+            </select>
+          </div>
+
+          <div>
+            <label>希望到貨日</label>
+            <input id="desiredDate" type="date">
+          </div>
+
+          <div>
+            <label>預估金額</label>
+            <input id="estimatedAmount" type="number" min="0" placeholder="選填">
+          </div>
+
+          <div class="full">
+            <label>用途說明<span class="required">*</span></label>
+            <textarea id="purpose" placeholder="請簡單說明為什麼需要採購"></textarea>
+          </div>
+
+          <div class="full">
+            <label>參考連結</label>
+            <input id="referenceUrl" type="url" placeholder="選填，例如商品網址">
+          </div>
+
+          <div class="full">
+            <label>圖片 / 截圖</label>
+            <input id="images" type="file" accept="image/*" multiple>
+            <div class="hint">最多 3 張，系統會自動合併成 1 張後上傳，速度會比逐張上傳穩定。</div>
+            <div id="preview" class="preview"></div>
+          </div>
+
+          <div class="full">
+            <label>備註</label>
+            <textarea id="note" placeholder="其他補充，選填"></textarea>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="submitBtn" class="primary" onclick="submitForm()">送出申請</button>
+          <button class="secondary" onclick="resetForm()">清除</button>
+        </div>
+
+        <div id="applyMessage" class="message"></div>
+      </div>
+    </section>
+
+    <section id="queryTab" class="hidden">
+      <div class="card">
+        <h2 class="section-title">查詢採購進度</h2>
+
+        <div class="grid">
+          <div>
+            <label>姓名</label>
+            <input id="queryName" type="text" placeholder="請輸入姓名">
+          </div>
+
+          <div>
+            <label>4 位查詢碼</label>
+            <input id="queryCode2" type="tel" maxlength="4" placeholder="例如 1234">
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" onclick="queryRequests()">查詢</button>
+        </div>
+
+        <div id="queryMessage" class="message"></div>
+        <div id="queryResults"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let selectedFiles = [];
+
+    document.getElementById('images').addEventListener('change', function(e) {
+      selectedFiles = Array.from(e.target.files || []).slice(0, 3);
+      renderPreview();
+    });
+
+    function showTab(tab) {
+      document.getElementById('applyTab').classList.toggle('hidden', tab !== 'apply');
+      document.getElementById('queryTab').classList.toggle('hidden', tab !== 'query');
+
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons[0].classList.toggle('active', tab === 'apply');
+      buttons[1].classList.toggle('active', tab === 'query');
+    }
+
+    function renderPreview() {
+      const box = document.getElementById('preview');
+      box.innerHTML = '';
+
+      selectedFiles.forEach(file => {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        box.appendChild(img);
+      });
+    }
+
+    function getValue(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function showMessage(id, type, text) {
+      const el = document.getElementById(id);
+      el.className = 'message ' + type;
+      el.innerHTML = text;
+    }
+
+    function clearMessage(id) {
+      const el = document.getElementById(id);
+      el.className = 'message';
+      el.innerHTML = '';
+    }
+
+    async function submitForm() {
+      clearMessage('applyMessage');
+
+      const form = {
+        name: getValue('name'),
+        queryCode: getValue('queryCode'),
+        department: getValue('department'),
+        email: getValue('email'),
+        category: getValue('category'),
+        itemName: getValue('itemName'),
+        spec: getValue('spec'),
+        quantity: getValue('quantity'),
+        purpose: getValue('purpose'),
+        urgency: getValue('urgency'),
+        desiredDate: getValue('desiredDate'),
+        estimatedAmount: getValue('estimatedAmount'),
+        referenceUrl: getValue('referenceUrl'),
+        note: getValue('note'),
+        mergedImageDataUrl: ''
+      };
+
+      if (!form.name || !form.queryCode || !form.department || !form.category || !form.itemName || !form.quantity || !form.purpose || !form.urgency) {
+        showMessage('applyMessage', 'error', '請先填完必填欄位。');
+        return;
+      }
+
+      if (!/^\d{4}$/.test(form.queryCode)) {
+        showMessage('applyMessage', 'error', '查詢碼請輸入 4 位數字。');
+        return;
+      }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = '送出中...';
+
+      try {
+        if (selectedFiles.length > 0) {
+          showMessage('applyMessage', 'ok', '圖片處理中，請稍候...');
+          form.mergedImageDataUrl = await mergeImagesToDataUrl(selectedFiles);
+        }
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            btn.disabled = false;
+            btn.textContent = '送出申請';
+
+            if (res && res.ok) {
+              showMessage('applyMessage', 'ok', '申請已送出。<br>申請編號：<b>' + res.requestNo + '</b><br>請記得您的姓名與 4 位查詢碼，之後可查詢進度。');
+              resetForm(false);
+            } else {
+              showMessage('applyMessage', 'error', (res && res.message) || '送出失敗');
+            }
+          })
+          .withFailureHandler(function(err) {
+            btn.disabled = false;
+            btn.textContent = '送出申請';
+            showMessage('applyMessage', 'error', err.message || String(err));
+          })
+          .submitPurchaseRequest(form);
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = '送出申請';
+        showMessage('applyMessage', 'error', err.message || String(err));
+      }
+    }
+
+    async function mergeImagesToDataUrl(files) {
+      const images = [];
+
+      for (const file of files) {
+        const img = await fileToImage(file);
+        images.push(img);
+      }
+
+      const targetWidth = 1000;
+      const gap = 20;
+      const padding = 20;
+
+      const scaled = images.map(img => {
+        const scale = targetWidth / img.width;
+        return {
+          img,
+          width: targetWidth,
+          height: Math.round(img.height * scale)
+        };
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = targetWidth + padding * 2;
+      canvas.height = scaled.reduce((sum, item) => sum + item.height, padding * 2 + gap * (scaled.length - 1));
+
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      let y = padding;
+      scaled.forEach(item => {
+        ctx.drawImage(item.img, padding, y, item.width, item.height);
+        y += item.height + gap;
+      });
+
+      return canvas.toDataURL('image/jpeg', 0.78);
+    }
+
+    function fileToImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            resolve(img);
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function resetForm(clearMsg = true) {
+      [
+        'name', 'queryCode', 'department', 'email', 'category', 'itemName',
+        'spec', 'quantity', 'purpose', 'urgency', 'desiredDate',
+        'estimatedAmount', 'referenceUrl', 'note'
+      ].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+
+      document.getElementById('images').value = '';
+      selectedFiles = [];
+      renderPreview();
+
+      if (clearMsg) clearMessage('applyMessage');
+    }
+
+    function queryRequests() {
+      clearMessage('queryMessage');
+      document.getElementById('queryResults').innerHTML = '';
+
+      const name = getValue('queryName');
+      const code = getValue('queryCode2');
+
+      if (!name || !code) {
+        showMessage('queryMessage', 'error', '請輸入姓名與 4 位查詢碼。');
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (!res || !res.ok) {
+            showMessage('queryMessage', 'error', (res && res.message) || '查詢失敗');
+            return;
+          }
+
+          renderQueryResults(res.records || []);
+        })
+        .withFailureHandler(function(err) {
+          showMessage('queryMessage', 'error', err.message || String(err));
+        })
+        .queryMyRequests(name, code);
+    }
+
+    function renderQueryResults(records) {
+      const box = document.getElementById('queryResults');
+
+      if (!records.length) {
+        showMessage('queryMessage', 'ok', '查無資料，請確認姓名與查詢碼是否正確。');
+        return;
+      }
+
+      clearMessage('queryMessage');
+
+      box.innerHTML = records.map(r => `
+        <div class="record">
+          <h3>${escapeHtml(r.itemName || '')}</h3>
+          <div class="meta">申請編號：${escapeHtml(r.requestNo || '')}｜建立時間：${escapeHtml(r.createdAt || '')}</div>
+          <div class="status">${escapeHtml(r.status || '')}</div>
+
+          <div class="kv">
+            <div class="k">採購類別</div><div>${escapeHtml(r.category || '')}</div>
+            <div class="k">數量</div><div>${escapeHtml(r.quantity || '')}</div>
+            <div class="k">緊急程度</div><div>${escapeHtml(r.urgency || '')}</div>
+            <div class="k">希望到貨</div><div>${escapeHtml(r.desiredDate || '')}</div>
+            <div class="k">規格說明</div><div>${escapeHtml(r.spec || '')}</div>
+            <div class="k">用途說明</div><div>${escapeHtml(r.purpose || '')}</div>
+            <div class="k">負責人</div><div>${escapeHtml(r.owner || '')}</div>
+            <div class="k">廠商</div><div>${escapeHtml(r.vendor || '')}</div>
+            <div class="k">實際金額</div><div>${escapeHtml(r.actualAmount || '')}</div>
+            <div class="k">預定到貨</div><div>${escapeHtml(r.arrivalDate || '')}</div>
+            <div class="k">管理備註</div><div>${escapeHtml(r.adminNote || '')}</div>
+            <div class="k">最後更新</div><div>${escapeHtml(r.lastUpdatedAt || '')}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+  </script>
+</body>
+</html>
