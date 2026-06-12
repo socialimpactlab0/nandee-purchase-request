@@ -17,7 +17,6 @@
       --line: #d8dee9;
       --danger: #b91c1c;
       --ok: #047857;
-      --warning: #b45309;
     }
 
     * {
@@ -142,6 +141,40 @@
       line-height: 1.5;
     }
 
+    .image-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .image-box {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+      background: #f8fafc;
+    }
+
+    .image-box label {
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .image-box input {
+      padding: 8px;
+      font-size: 14px;
+    }
+
+    .preview-img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      margin-top: 8px;
+      display: none;
+      background: white;
+    }
+
     .actions {
       display: flex;
       gap: 10px;
@@ -192,21 +225,6 @@
       background: #fef2f2;
       color: var(--danger);
       border: 1px solid #fecaca;
-    }
-
-    .preview {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .preview img {
-      width: 100px;
-      height: 100px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      object-fit: cover;
     }
 
     .record {
@@ -261,6 +279,10 @@
       }
 
       .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .image-grid {
         grid-template-columns: 1fr;
       }
 
@@ -389,9 +411,27 @@
 
           <div class="full">
             <label>圖片 / 截圖</label>
-            <input id="images" type="file" accept="image/*" multiple>
-            <div class="hint">最多 3 張，系統會自動合併成 1 張後上傳，速度會比逐張上傳穩定。</div>
-            <div id="preview" class="preview"></div>
+            <div class="hint">最多 3 張，請一張一張選。送出時系統會自動合併成 1 張後上傳。</div>
+
+            <div class="image-grid" style="margin-top: 10px;">
+              <div class="image-box">
+                <label>圖片 / 截圖 1</label>
+                <input id="image1" type="file" accept="image/*" onchange="previewImage(1)">
+                <img id="preview1" class="preview-img">
+              </div>
+
+              <div class="image-box">
+                <label>圖片 / 截圖 2</label>
+                <input id="image2" type="file" accept="image/*" onchange="previewImage(2)">
+                <img id="preview2" class="preview-img">
+              </div>
+
+              <div class="image-box">
+                <label>圖片 / 截圖 3</label>
+                <input id="image3" type="file" accept="image/*" onchange="previewImage(3)">
+                <img id="preview3" class="preview-img">
+              </div>
+            </div>
           </div>
 
           <div class="full">
@@ -436,13 +476,6 @@
   </main>
 
   <script>
-    let selectedFiles = [];
-
-    document.getElementById('images').addEventListener('change', function(e) {
-      selectedFiles = Array.from(e.target.files || []).slice(0, 3);
-      renderPreview();
-    });
-
     function showTab(tab) {
       document.getElementById('applyTab').classList.toggle('hidden', tab !== 'apply');
       document.getElementById('queryTab').classList.toggle('hidden', tab !== 'query');
@@ -450,17 +483,6 @@
       const buttons = document.querySelectorAll('.tab-btn');
       buttons[0].classList.toggle('active', tab === 'apply');
       buttons[1].classList.toggle('active', tab === 'query');
-    }
-
-    function renderPreview() {
-      const box = document.getElementById('preview');
-      box.innerHTML = '';
-
-      selectedFiles.forEach(file => {
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(file);
-        box.appendChild(img);
-      });
     }
 
     function getValue(id) {
@@ -477,6 +499,33 @@
       const el = document.getElementById(id);
       el.className = 'message';
       el.innerHTML = '';
+    }
+
+    function previewImage(no) {
+      const input = document.getElementById('image' + no);
+      const img = document.getElementById('preview' + no);
+
+      if (!input.files || !input.files[0]) {
+        img.style.display = 'none';
+        img.src = '';
+        return;
+      }
+
+      img.src = URL.createObjectURL(input.files[0]);
+      img.style.display = 'block';
+    }
+
+    function getSelectedImageFiles() {
+      const files = [];
+
+      for (let i = 1; i <= 3; i++) {
+        const input = document.getElementById('image' + i);
+        if (input.files && input.files[0]) {
+          files.push(input.files[0]);
+        }
+      }
+
+      return files;
     }
 
     async function submitForm() {
@@ -515,9 +564,11 @@
       btn.textContent = '送出中...';
 
       try {
-        if (selectedFiles.length > 0) {
-          showMessage('applyMessage', 'ok', '圖片處理中，請稍候...');
-          form.mergedImageDataUrl = await mergeImagesToDataUrl(selectedFiles);
+        const imageFiles = getSelectedImageFiles();
+
+        if (imageFiles.length > 0) {
+          showMessage('applyMessage', 'ok', '圖片合併處理中，請稍候...');
+          form.mergedImageDataUrl = await mergeImagesToDataUrl(imageFiles);
         }
 
         google.script.run
@@ -560,7 +611,7 @@
       const scaled = images.map(img => {
         const scale = targetWidth / img.width;
         return {
-          img,
+          img: img,
           width: targetWidth,
           height: Math.round(img.height * scale)
         };
@@ -575,6 +626,7 @@
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       let y = padding;
+
       scaled.forEach(item => {
         ctx.drawImage(item.img, padding, y, item.width, item.height);
         y += item.height + gap;
@@ -589,9 +641,11 @@
 
         reader.onload = function(e) {
           const img = new Image();
+
           img.onload = function() {
             resolve(img);
           };
+
           img.onerror = reject;
           img.src = e.target.result;
         };
@@ -603,16 +657,30 @@
 
     function resetForm(clearMsg = true) {
       [
-        'name', 'queryCode', 'department', 'email', 'category', 'itemName',
-        'spec', 'quantity', 'purpose', 'urgency', 'desiredDate',
-        'estimatedAmount', 'referenceUrl', 'note'
+        'name',
+        'queryCode',
+        'department',
+        'email',
+        'category',
+        'itemName',
+        'spec',
+        'quantity',
+        'purpose',
+        'urgency',
+        'desiredDate',
+        'estimatedAmount',
+        'referenceUrl',
+        'note'
       ].forEach(id => {
         document.getElementById(id).value = '';
       });
 
-      document.getElementById('images').value = '';
-      selectedFiles = [];
-      renderPreview();
+      for (let i = 1; i <= 3; i++) {
+        document.getElementById('image' + i).value = '';
+        const img = document.getElementById('preview' + i);
+        img.src = '';
+        img.style.display = 'none';
+      }
 
       if (clearMsg) clearMessage('applyMessage');
     }
@@ -679,7 +747,7 @@
     }
 
     function escapeHtml(text) {
-      return String(text)
+      return String(text || '')
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;')
